@@ -1,0 +1,16 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ewm_main_db
+    username: ewm_user
+    password: ewm_password
+
+stats-server:
+  url: http://localhost:9090
+
+logging:
+  level:
+    root: INFO
+    ru.practicum.explorewithme.main: DEBUG
