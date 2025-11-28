@@ -6,6 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class StatsServerApp {
     public static void main(String[] args) {
-        SpringApplication.run(StatsServerApp.class);
+        SpringApplication.run(StatsServerApp.class, args);
     }
 }
