@@ -6,6 +6,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/ewm_main_db
     username: ewm_user
     password: ewm_password
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
 
 stats-server:
   url: http://localhost:9090
