@@ -1,83 +1,153 @@
 package ru.practicum.client;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.policy.MaxAttemptsRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.ViewStatsDto;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.net.URI;
 import java.util.List;
 
-@Service
 @Slf4j
+@Component
 public class StatsClientImpl implements StatsClient {
 
-    private final RestClient restClient;
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final RestTemplate restTemplate;
+    private final DiscoveryClient discoveryClient;
+    private final RetryTemplate retryTemplate;
+    private final String statsServiceId;
 
-    public StatsClientImpl(@Value("${stats-server.url}") String statsServerUrl) {
-        this.restClient = RestClient.builder()
-                .baseUrl(statsServerUrl)
-                .defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
-                    String errorMessage = "Ошибка при обращении к серверу статистики: " +
-                            response.getStatusCode() + " " + response.getStatusText();
-                    log.error(errorMessage);
-                    if (response.getStatusCode().is4xxClientError()) {
-                        throw new RestClientException("Ошибка запроса: " + errorMessage);
-                    } else if (response.getStatusCode().is5xxServerError()) {
-                        throw new RestClientException("Ошибка сервера: " + errorMessage);
-                    } else {
-                        throw new RestClientException(errorMessage);
-                    }
-                })
+    @Autowired
+    public StatsClientImpl(DiscoveryClient discoveryClient,
+                          @Value("${discovery.services.stats-server-id:stats-server}") String statsServiceId,
+                          RestTemplateBuilder builder) {
+        this.discoveryClient = discoveryClient;
+        this.statsServiceId = statsServiceId;
+        this.restTemplate = builder
+                .uriTemplateHandler(new DefaultUriBuilderFactory(""))
+                .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
                 .build();
+        
+        this.retryTemplate = new RetryTemplate();
+        FixedBackOffPolicy fixedBackOffPolicy = new FixedBackOffPolicy();
+        fixedBackOffPolicy.setBackOffPeriod(3000L);
+        retryTemplate.setBackOffPolicy(fixedBackOffPolicy);
+        
+        MaxAttemptsRetryPolicy retryPolicy = new MaxAttemptsRetryPolicy();
+        retryPolicy.setMaxAttempts(3);
+        retryTemplate.setRetryPolicy(retryPolicy);
     }
 
     @Override
     public void saveHit(EndpointHitDto endpointHitDto) {
-        log.info("Отправка данных статистики: {}", endpointHitDto);
-        restClient.post()
-                .uri("/hit")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(endpointHitDto)
-                .retrieve()
-                .toBodilessEntity();
-        log.info("Статистика добавлена");
+        HttpEntity<EndpointHitDto> requestEntity = new HttpEntity<>(endpointHitDto, defaultHeaders());
+        try {
+            restTemplate.exchange(makeUri("/hit"), HttpMethod.POST, requestEntity, Object.class);
+            log.info("Статистика успешно отправлена: {}", endpointHitDto);
+        } catch (HttpStatusCodeException e) {
+            log.error("Не удалось отправить хит статистики. Код ошибки: {}, сообщение: {}", 
+                    e.getStatusCode(), e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("Не удалось отправить хит статистики. Исключение: {}, сообщение: {}", 
+                    e.getClass().getName(), e.getMessage(), e);
+        }
     }
 
     @Override
     public List<ViewStatsDto> getStats(String start, String end, List<String> uris, Boolean unique) {
-        log.info("Запрос статистики с параметрами start={}, end={}, uris={}, unique={}", start, end, uris, unique);
+        if (!checkValidParams(start, end, uris)) {
+            log.error("Не удалось получить статистику из-за некорректных параметров: start={}, end={}, uris={}", 
+                    start, end, uris);
+            return List.of();
+        }
 
-        LocalDateTime.parse(start, DATE_TIME_FORMATTER);
-        LocalDateTime.parse(end, DATE_TIME_FORMATTER);
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromPath("/stats")
+                .queryParam("start", start)
+                .queryParam("end", end);
 
-        List<ViewStatsDto> stats = restClient.get()
-                .uri(uriBuilder -> {
-                    uriBuilder.path("/stats")
-                            .queryParam("start", start)
-                            .queryParam("end", end);
-                    if (uris != null && !uris.isEmpty()) {
-                        for (String uri : uris) {
-                            uriBuilder.queryParam("uris", uri);
-                        }
-                    }
-                    if (unique != null) {
-                        uriBuilder.queryParam("unique", unique);
-                    }
-                    return uriBuilder.build();
-                })
-                .retrieve()
-                .body(new ParameterizedTypeReference<>() {
-                });
-        log.info("Статистика получена: {}", stats);
-        return stats;
+        if (uris != null && !uris.isEmpty()) {
+            for (String uri : uris) {
+                uriComponentsBuilder.queryParam("uris", uri);
+            }
+        }
+
+        if (unique != null) {
+            uriComponentsBuilder.queryParam("unique", unique);
+        }
+
+        String uri = uriComponentsBuilder.build(false)
+                .encode()
+                .toUriString();
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(defaultHeaders());
+
+        ResponseEntity<ViewStatsDto[]> statServerResponse;
+        try {
+            statServerResponse = restTemplate.exchange(makeUri(uri), HttpMethod.GET, requestEntity, ViewStatsDto[].class);
+            log.info("Статистика успешно получена");
+        } catch (HttpStatusCodeException e) {
+            log.error("Не удалось получить статистику. Код ошибки: {}, сообщение: {}", 
+                    e.getStatusCode(), e.getMessage(), e);
+            return List.of();
+        } catch (Exception e) {
+            log.error("Не удалось получить статистику. Исключение: {}, сообщение: {}", 
+                    e.getClass().getName(), e.getMessage(), e);
+            return List.of();
+        }
+
+        ViewStatsDto[] body = statServerResponse.getBody();
+        return body != null ? List.of(body) : List.of();
+    }
+
+    private boolean checkValidParams(String start, String end, List<String> uris) {
+        if (start == null || end == null || start.isEmpty() || end.isEmpty()) {
+            return false;
+        }
+        if (uris != null && uris.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    private HttpHeaders defaultHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        return headers;
+    }
+
+    private URI makeUri(String path) {
+        ServiceInstance instance = retryTemplate.execute(context -> getInstance(statsServiceId));
+        log.debug("Используется инстанс stats-server: host={}, port={}", instance.getHost(), instance.getPort());
+        return URI.create("http://" + instance.getHost() + ":" + instance.getPort() + path);
+    }
+
+    private ServiceInstance getInstance(String serviceId) {
+        try {
+            List<ServiceInstance> instances = discoveryClient.getInstances(serviceId);
+            if (instances == null || instances.isEmpty()) {
+                throw new RuntimeException("Не найдено инстансов сервиса статистики с id: " + serviceId);
+            }
+            return instances.getFirst();
+        } catch (Exception exception) {
+            throw new RuntimeException(
+                    "Ошибка обнаружения адреса сервиса статистики с id: " + serviceId,
+                    exception
+            );
+        }
     }
 }
