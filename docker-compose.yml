@@ -27,7 +27,7 @@ services:
       POSTGRES_PASSWORD: ewm_password
       POSTGRES_DB: ewm_main_db
     volumes:
-      - ./core/main-service/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./core/event-service/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -p 5432" ]
       interval: 10s
