@@ -1,0 +1,110 @@
+--------------------------------
+Лог выполнения от 16/12/2025 - 01:15:23.095 MSK
+--------------------------------
+16/12/2025 - 01:15:23.117 MSK -- [Trace]: Сгенерирован следующий набор событий о действиях пользователей:
+{ user: 3, event: 1, type: ACTION_REGISTER, timestamp: 2025-12-12T22:15:23.110979600Z }
+{ user: 3, event: 12, type: ACTION_REGISTER, timestamp: 2025-12-12T22:17:33.438979600Z }
+{ user: 9, event: 1, type: ACTION_VIEW, timestamp: 2025-12-12T22:24:05.192979600Z }
+{ user: 1, event: 9, type: ACTION_REGISTER, timestamp: 2025-12-12T22:28:20.409979600Z }
+{ user: 3, event: 4, type: ACTION_VIEW, timestamp: 2025-12-12T22:32:56.338979600Z }
+{ user: 2, event: 3, type: ACTION_REGISTER, timestamp: 2025-12-12T22:37:49.302979600Z }
+{ user: 8, event: 13, type: ACTION_REGISTER, timestamp: 2025-12-12T22:45:36.055979600Z }
+{ user: 3, event: 10, type: ACTION_VIEW, timestamp: 2025-12-12T22:47:55.981979600Z }
+{ user: 3, event: 6, type: ACTION_REGISTER, timestamp: 2025-12-12T22:56:13.525979600Z }
+{ user: 6, event: 7, type: ACTION_VIEW, timestamp: 2025-12-12T23:04:01.653979600Z }
+{ user: 4, event: 4, type: ACTION_VIEW, timestamp: 2025-12-12T23:11:07.123979600Z }
+{ user: 1, event: 12, type: ACTION_REGISTER, timestamp: 2025-12-12T23:12:12.871979600Z }
+{ user: 4, event: 5, type: ACTION_REGISTER, timestamp: 2025-12-12T23:19:57.863979600Z }
+{ user: 1, event: 7, type: ACTION_VIEW, timestamp: 2025-12-12T23:22:53.635979600Z }
+{ user: 1, event: 7, type: ACTION_VIEW, timestamp: 2025-12-12T23:31:14.016979600Z }
+{ user: 1, event: 2, type: ACTION_VIEW, timestamp: 2025-12-12T23:38:22.578979600Z }
+{ user: 3, event: 2, type: ACTION_REGISTER, timestamp: 2025-12-12T23:41:47.782979600Z }
+{ user: 7, event: 5, type: ACTION_VIEW, timestamp: 2025-12-12T23:45:36.328979600Z }
+{ user: 1, event: 3, type: ACTION_REGISTER, timestamp: 2025-12-12T23:51:22.962979600Z }
+{ user: 5, event: 1, type: ACTION_VIEW, timestamp: 2025-12-12T23:52:48.734979600Z }
+{ user: 7, event: 12, type: ACTION_REGISTER, timestamp: 2025-12-12T23:54:11.136979600Z }
+{ user: 8, event: 13, type: ACTION_LIKE, timestamp: 2025-12-13T00:00:43.467979600Z }
+{ user: 8, event: 4, type: ACTION_REGISTER, timestamp: 2025-12-13T00:06:19.097979600Z }
+{ user: 6, event: 5, type: ACTION_VIEW, timestamp: 2025-12-13T00:08:43.728979600Z }
+{ user: 7, event: 5, type: ACTION_REGISTER, timestamp: 2025-12-13T00:10:08.011979600Z }
+{ user: 2, event: 12, type: ACTION_VIEW, timestamp: 2025-12-13T00:14:56.594979600Z }
+{ user: 7, event: 10, type: ACTION_VIEW, timestamp: 2025-12-13T00:21:59.863979600Z }
+{ user: 2, event: 8, type: ACTION_REGISTER, timestamp: 2025-12-13T00:23:18.693979600Z }
+{ user: 6, event: 4, type: ACTION_VIEW, timestamp: 2025-12-13T00:31:30.398979600Z }
+{ user: 5, event: 7, type: ACTION_REGISTER, timestamp: 2025-12-13T00:38:20.578979600Z }
+{ user: 8, event: 6, type: ACTION_VIEW, timestamp: 2025-12-13T00:47:15.586979600Z }
+{ user: 3, event: 9, type: ACTION_REGISTER, timestamp: 2025-12-13T00:50:11.912979600Z }
+{ user: 6, event: 6, type: ACTION_REGISTER, timestamp: 2025-12-13T00:59:48.511979600Z }
+{ user: 6, event: 2, type: ACTION_VIEW, timestamp: 2025-12-13T01:05:21.623979600Z }
+{ user: 8, event: 11, type: ACTION_REGISTER, timestamp: 2025-12-13T01:12:06.374979600Z }
+{ user: 3, event: 1, type: ACTION_LIKE, timestamp: 2025-12-13T01:16:27.625979600Z }
+{ user: 5, event: 11, type: ACTION_VIEW, timestamp: 2025-12-13T01:20:15.936979600Z }
+{ user: 1, event: 11, type: ACTION_VIEW, timestamp: 2025-12-13T01:29:51.055979600Z }
+{ user: 9, event: 10, type: ACTION_VIEW, timestamp: 2025-12-13T01:35:15.562979600Z }
+{ user: 5, event: 5, type: ACTION_REGISTER, timestamp: 2025-12-13T01:44:40.373979600Z }
+{ user: 2, event: 9, type: ACTION_VIEW, timestamp: 2025-12-13T01:48:13.473979600Z }
+{ user: 8, event: 12, type: ACTION_REGISTER, timestamp: 2025-12-13T01:57:18.100979600Z }
+{ user: 1, event: 12, type: ACTION_VIEW, timestamp: 2025-12-13T02:00:02.589979600Z }
+{ user: 8, event: 8, type: ACTION_VIEW, timestamp: 2025-12-13T02:09:15.944979600Z }
+{ user: 7, event: 4, type: ACTION_VIEW, timestamp: 2025-12-13T02:15:51.216979600Z }
+{ user: 6, event: 7, type: ACTION_REGISTER, timestamp: 2025-12-13T02:23:17.939979600Z }
+{ user: 7, event: 7, type: ACTION_VIEW, timestamp: 2025-12-13T02:25:21.640979600Z }
+{ user: 9, event: 10, type: ACTION_VIEW, timestamp: 2025-12-13T02:27:18.417979600Z }
+{ user: 2, event: 4, type: ACTION_REGISTER, timestamp: 2025-12-13T02:35:33.186979600Z }
+{ user: 8, event: 4, type: ACTION_LIKE, timestamp: 2025-12-13T02:39:40.818979600Z }
+{ user: 9, event: 1, type: ACTION_VIEW, timestamp: 2025-12-13T02:46:54.526979600Z }
+{ user: 1, event: 1, type: ACTION_REGISTER, timestamp: 2025-12-13T02:51:09.188979600Z }
+{ user: 2, event: 3, type: ACTION_VIEW, timestamp: 2025-12-13T02:56:57.377979600Z }
+{ user: 3, event: 2, type: ACTION_VIEW, timestamp: 2025-12-13T02:59:24.659979600Z }
+{ user: 2, event: 6, type: ACTION_REGISTER, timestamp: 2025-12-13T03:08:15.062979600Z }
+{ user: 8, event: 3, type: ACTION_VIEW, timestamp: 2025-12-13T03:14:19.387979600Z }
+{ user: 9, event: 11, type: ACTION_REGISTER, timestamp: 2025-12-13T03:19:23.227979600Z }
+{ user: 1, event: 2, type: ACTION_REGISTER, timestamp: 2025-12-13T03:26:20.767979600Z }
+{ user: 7, event: 11, type: ACTION_REGISTER, timestamp: 2025-12-13T03:34:40.603979600Z }
+{ user: 6, event: 5, type: ACTION_VIEW, timestamp: 2025-12-13T03:37:08.152979600Z }
+{ user: 2, event: 11, type: ACTION_VIEW, timestamp: 2025-12-13T03:42:27.282979600Z }
+{ user: 4, event: 1, type: ACTION_REGISTER, timestamp: 2025-12-13T03:51:36.656979600Z }
+{ user: 9, event: 13, type: ACTION_VIEW, timestamp: 2025-12-13T03:57:32.075979600Z }
+{ user: 3, event: 8, type: ACTION_REGISTER, timestamp: 2025-12-13T04:04:11.525979600Z }
+{ user: 3, event: 1, type: ACTION_VIEW, timestamp: 2025-12-13T04:10:28.286979600Z }
+{ user: 5, event: 12, type: ACTION_VIEW, timestamp: 2025-12-13T04:16:23.962979600Z }
+{ user: 1, event: 6, type: ACTION_VIEW, timestamp: 2025-12-13T04:23:28.898979600Z }
+{ user: 7, event: 3, type: ACTION_VIEW, timestamp: 2025-12-13T04:27:22.411979600Z }
+{ user: 9, event: 13, type: ACTION_VIEW, timestamp: 2025-12-13T04:29:45.869979600Z }
+{ user: 5, event: 8, type: ACTION_VIEW, timestamp: 2025-12-13T04:38:40.412979600Z }
+{ user: 8, event: 11, type: ACTION_LIKE, timestamp: 2025-12-13T04:40:28.890979600Z }
+{ user: 9, event: 1, type: ACTION_VIEW, timestamp: 2025-12-13T04:49:49.552979600Z }
+{ user: 5, event: 12, type: ACTION_VIEW, timestamp: 2025-12-13T04:59:08.319979600Z }
+{ user: 5, event: 8, type: ACTION_REGISTER, timestamp: 2025-12-13T05:00:53.854979600Z }
+{ user: 2, event: 8, type: ACTION_LIKE, timestamp: 2025-12-13T05:05:14.864979600Z }
+{ user: 3, event: 9, type: ACTION_VIEW, timestamp: 2025-12-13T05:09:55.621979600Z }
+{ user: 7, event: 3, type: ACTION_REGISTER, timestamp: 2025-12-13T05:17:55.844979600Z }
+{ user: 3, event: 11, type: ACTION_VIEW, timestamp: 2025-12-13T05:20:05.747979600Z }
+{ user: 5, event: 3, type: ACTION_VIEW, timestamp: 2025-12-13T05:28:21.351979600Z }
+{ user: 9, event: 8, type: ACTION_REGISTER, timestamp: 2025-12-13T05:33:34.412979600Z }
+{ user: 9, event: 8, type: ACTION_LIKE, timestamp: 2025-12-13T05:39:26.700979600Z }
+{ user: 3, event: 1, type: ACTION_LIKE, timestamp: 2025-12-13T05:47:45.949979600Z }
+{ user: 3, event: 12, type: ACTION_VIEW, timestamp: 2025-12-13T05:53:44.435979600Z }
+{ user: 5, event: 10, type: ACTION_REGISTER, timestamp: 2025-12-13T06:01:40.603979600Z }
+{ user: 8, event: 6, type: ACTION_VIEW, timestamp: 2025-12-13T06:05:01.559979600Z }
+{ user: 7, event: 9, type: ACTION_VIEW, timestamp: 2025-12-13T06:06:56.230979600Z }
+{ user: 1, event: 4, type: ACTION_REGISTER, timestamp: 2025-12-13T06:12:46.656979600Z }
+{ user: 9, event: 13, type: ACTION_REGISTER, timestamp: 2025-12-13T06:16:35.970979600Z }
+16/12/2025 - 01:15:23.119 MSK -- Начинаю тестирование. Сгенерировано 88 событий
+16/12/2025 - 01:15:23.119 MSK -- Начинаю верификацию сервиса Collector
+16/12/2025 - 01:15:23.119 MSK -- Отправляю событие о действии пользователя: { user: 3, event: 1, type: ACTION_REGISTER, timestamp: 2025-12-12T22:15:23.110979600Z }
+16/12/2025 - 01:15:23.877 MSK -- [Trace]: Событие отправлено: { user: 3, event: 1, type: ACTION_REGISTER, timestamp: 2025-12-12T22:15:23.110979600Z }
+16/12/2025 - 01:15:23.877 MSK -- Ожидаю 10 секунд получения события { user: 3, event: 1, type: ACTION_REGISTER, timestamp: 2025-12-12T22:15:23.110979600Z } из топика stats.user-actions.v1
+16/12/2025 - 01:15:24.054 MSK -- [Trace]: Начинаю верификацию полученного события: { user: 3, event: 1, type: REGISTER, timestamp: 2025-12-12T22:15:23.110Z }
+16/12/2025 - 01:15:24.055 MSK -- Событие REGISTER пользователя 3 с мероприятием 1 - проверено
+--------------------------------
+16/12/2025 - 01:15:24.057 MSK -- Начинаю верификацию сервиса Aggregator. Рассчитываю обновления коэффициента схожести с другими мероприятиями
+16/12/2025 - 01:15:24.057 MSK -- [Trace]: Тестер: это первое взаимодействие с мероприятием [1]. Рассчитываем коэффициенты схожести с другими мероприятиями.
+16/12/2025 - 01:15:24.058 MSK -- Для данного действия обновления коэффициента схожести не требуется
+--------------------------------
+16/12/2025 - 01:15:25.065 MSK -- Начинаю верификацию сервиса Analyzer
+--------------------------------
+--------------------------------
+16/12/2025 - 01:15:25.067 MSK -- Отправляю gRPC-запрос на получение количества взаимодействий с мероприятием [1]
+--------------------------------
+Обнаружено 0 ошибок.

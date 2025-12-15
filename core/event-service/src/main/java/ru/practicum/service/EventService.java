@@ -44,4 +44,6 @@ public interface EventService {
                                      HttpServletRequest request);
 
     EventFullDto getPublicEvent(Long eventId, HttpServletRequest request);
+
+    void likeEvent(Long userId, Long eventId);
 }

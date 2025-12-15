@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.StatsClient;
 import ru.practicum.client.event.EventClient;
 import ru.practicum.client.user.UserClient;
 import ru.practicum.dto.event.EventFullDto;
@@ -34,6 +35,7 @@ public class RequestServiceImpl implements RequestService {
     private final UserClient userClient;
     private final EventClient eventClient;
     private final RequestMapper requestMapper;
+    private final StatsClient statsClient;
 
     @Override
     public List<ParticipationRequestDto> getUserRequests(Long userId) {
@@ -86,6 +88,15 @@ public class RequestServiceImpl implements RequestService {
         request.setStatus(status);
 
         Request saved = requestRepository.save(request);
+        
+        if (status == RequestStatus.CONFIRMED) {
+            try {
+                statsClient.recordRegister(userId, eventId);
+            } catch (Exception e) {
+                log.warn("Не удалось отправить действие регистрации: {}", e.getMessage());
+            }
+        }
+        
         return requestMapper.toDto(saved);
     }
 
@@ -154,6 +165,11 @@ public class RequestServiceImpl implements RequestService {
                 } else {
                     req.setStatus(RequestStatus.CONFIRMED);
                     confirmedRequests.add(requestMapper.toDto(req));
+                    try {
+                        statsClient.recordRegister(req.getRequesterId(), eventId);
+                    } catch (Exception e) {
+                        log.warn("Не удалось отправить действие регистрации: {}", e.getMessage());
+                    }
                 }
             } else if (updateRequestDto.getStatus() == RequestStatus.REJECTED) {
                 req.setStatus(RequestStatus.REJECTED);

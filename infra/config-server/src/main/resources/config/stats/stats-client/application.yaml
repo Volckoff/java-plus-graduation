@@ -1,2 +1,7 @@
-stats-server:
-  url: http://stats-server:9090
+grpc:
+  client:
+    collector:
+      address: 'discovery:///collector'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext

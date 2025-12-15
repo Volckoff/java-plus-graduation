@@ -18,9 +18,6 @@ spring:
     username: ewm_user
     password: ewm_password
 
-stats-server:
-  url: http://localhost:9090
-
 feign:
   circuitbreaker:
     enabled: true
@@ -44,3 +41,11 @@ logging:
     "org.springframework.orm.jpa": INFO
     "org.springframework.transaction": INFO
     "org.hibernate.SQL": DEBUG
+
+grpc:
+  client:
+    collector:
+      address: 'discovery:///collector'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext

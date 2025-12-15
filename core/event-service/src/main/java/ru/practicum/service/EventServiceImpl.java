@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.EndpointHitDto;
 import ru.practicum.client.StatsClient;
 import ru.practicum.client.request.RequestClient;
 import ru.practicum.client.user.UserClient;
@@ -201,8 +200,6 @@ public class EventServiceImpl implements EventService {
         List<Event> events = eventRepository.findPublishedEvents(
                 text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
 
-        saveHit(request);
-
         if (events.isEmpty()) return List.of();
 
         Set<Long> initiatorIds = events.stream()
@@ -211,7 +208,6 @@ public class EventServiceImpl implements EventService {
         Map<Long, UserShortDto> usersMap = getUserShortDtoMap(initiatorIds);
 
         return events.stream()
-                .peek(event -> event.setViews(getViewsForEvent(event.getId())))
                 .map(event -> buildShortDto(event, usersMap))
                 .collect(Collectors.toList());
     }
@@ -225,7 +221,7 @@ public class EventServiceImpl implements EventService {
             throw new NotFoundException("Event", "id", eventId);
         }
 
-        saveHit(request);
+        statsClient.recordView(0L, eventId);
 
         event.setViews(event.getViews() + 1);
         eventRepository.save(event);
@@ -345,31 +341,21 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-    private void saveHit(HttpServletRequest request) {
+    @Override
+    public void likeEvent(Long userId, Long eventId) {
+        getUserOrThrow(userId);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event", "id", eventId));
+
+        if (!event.getState().equals(EventState.PUBLISHED)) {
+            throw new ConflictException("Нельзя лайкнуть неопубликованное событие");
+        }
+
         try {
-            EndpointHitDto hit = EndpointHitDto.builder()
-                    .app("ewm-event-service")
-                    .uri(request.getRequestURI())
-                    .ip(request.getRemoteAddr())
-                    .timestamp(LocalDateTime.now())
-                    .build();
-            statsClient.saveHit(hit);
+            statsClient.recordLike(userId, eventId);
         } catch (Exception e) {
-            log.warn("Не удалось записать хит статистики: {}", e.getMessage());
+            log.warn("Не удалось отправить действие лайка: {}", e.getMessage());
         }
     }
 
-    private Long getViewsForEvent(Long eventId) {
-        String start = LocalDateTime.now().minusYears(10).format(FORMATTER);
-        String end = LocalDateTime.now().format(FORMATTER);
-        String uri = "/events/" + eventId;
-
-        try {
-            var listStats = statsClient.getStats(start, end, List.of(uri), true);
-            return listStats.isEmpty() ? 0L : listStats.get(0).getHits();
-        } catch (Exception e) {
-            log.warn("Не удалось получить хит статистики: {}", e.getMessage());
-            return 0L;
-        }
-    }
 }
