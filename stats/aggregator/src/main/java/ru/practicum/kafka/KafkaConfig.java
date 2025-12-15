@@ -16,4 +16,5 @@ public class KafkaConfig {
     private EnumMap<KafkaTopic, String> topics = new EnumMap<>(KafkaTopic.class);
     private Properties producerProps;
     private Properties consumerProps;
+    private long attemptTimeout = 100;
 }

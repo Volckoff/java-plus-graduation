@@ -26,19 +26,20 @@ import java.util.Map;
 @Slf4j
 @Component
 public class AggregatorStarter {
-    private static final Duration CONSUME_ATTEMPT_TIMEOUT = Duration.ofMillis(5000);
     private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
     private static final int COUNT_FIX_OFFSETS = 10;
     private final KafkaProducer<Long, SpecificRecordBase> producer;
     private final KafkaConsumer<Long, UserActionAvro> consumer;
     private final EnumMap<KafkaTopic, String> topics;
     private final SimilarityService similarityService;
+    private final Duration consumeAttemptTimeout;
 
     public AggregatorStarter(KafkaConfig kafkaConfig, SimilarityService similarityService) {
         this.topics = kafkaConfig.getTopics();
         this.producer = new KafkaProducer<>(kafkaConfig.getProducerProps());
         this.consumer = new KafkaConsumer<>(kafkaConfig.getConsumerProps());
         this.similarityService = similarityService;
+        this.consumeAttemptTimeout = Duration.ofMillis(kafkaConfig.getAttemptTimeout());
     }
 
     public void start() {
@@ -48,7 +49,7 @@ public class AggregatorStarter {
             Runtime.getRuntime().addShutdownHook(new Thread(consumer::wakeup));
 
             while (true) {
-                ConsumerRecords<Long, UserActionAvro> records = consumer.poll(CONSUME_ATTEMPT_TIMEOUT);
+                ConsumerRecords<Long, UserActionAvro> records = consumer.poll(consumeAttemptTimeout);
                 if (records.isEmpty()) continue;
 
                 int count = 0;
@@ -103,5 +104,6 @@ public class AggregatorStarter {
         }
     }
 }
+
 
 
