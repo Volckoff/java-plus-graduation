@@ -1,54 +1,31 @@
 package ru.practicum.kafka;
 
 import lombok.Getter;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import ru.practicum.ewm.stat.avro.EventSimilarityAvro;
-import ru.practicum.ewm.stat.avro.UserActionAvro;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
+import java.util.EnumMap;
 import java.util.Properties;
 
+@Slf4j
 @Getter
-@Configuration
-@EnableConfigurationProperties({KafkaConfigProperties.class})
+@Setter
+@Component
+@ConfigurationProperties("analyzer.kafka")
 public class KafkaConfig {
-    private final KafkaConfigProperties kafkaProperties;
+    private EnumMap<KafkaTopic, String> topics = new EnumMap<>(KafkaTopic.class);
+    private Properties actionConsumerProps;
+    private Properties similarityConsumerProps;
+    private long attemptTimeout = 500;
 
-    public KafkaConfig(KafkaConfigProperties properties) {
-        this.kafkaProperties = properties;
-    }
-
-    @Bean
-    public KafkaConsumer<Long, EventSimilarityAvro> getEventSimilarityConsumer() {
-        Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getEventSimilarityConsumer().getGroupId());
-        props.put(ConsumerConfig.CLIENT_ID_CONFIG, kafkaProperties.getEventSimilarityConsumer().getClientId());
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                kafkaProperties.getEventSimilarityConsumer().getKeyDeserializer());
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                kafkaProperties.getEventSimilarityConsumer().getValueDeserializer());
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,
-                kafkaProperties.getEventSimilarityConsumer().getEnableAutoCommit());
-
-        return new KafkaConsumer<>(props);
-    }
-
-    @Bean
-    public KafkaConsumer<Long, UserActionAvro> getUserActionConsumer() {
-        Properties props = new Properties();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, kafkaProperties.getUserActionConsumer().getGroupId());
-        props.put(ConsumerConfig.CLIENT_ID_CONFIG, kafkaProperties.getUserActionConsumer().getClientId());
-        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-                kafkaProperties.getUserActionConsumer().getKeyDeserializer());
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                kafkaProperties.getUserActionConsumer().getValueDeserializer());
-        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,
-                kafkaProperties.getUserActionConsumer().getEnableAutoCommit());
-        return new KafkaConsumer<>(props);
+    @PostConstruct
+    public void logConfig() {
+        log.info("KafkaConfig loaded:");
+        log.info("Topics: {}", topics);
+        log.info("ActionConsumerProps: {}", actionConsumerProps);
+        log.info("SimilarityConsumerProps: {}", similarityConsumerProps);
     }
 }

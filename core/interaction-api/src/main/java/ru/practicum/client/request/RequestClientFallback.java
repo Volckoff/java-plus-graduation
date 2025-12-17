@@ -13,6 +13,12 @@ public class RequestClientFallback implements RequestOperation {
         log.warn("Request service is unavailable. Fallback: returning 0 for event ID: {}", eventId);
         return 0L;
     }
+
+    @Override
+    public Boolean hasConfirmedRequest(Long userId, Long eventId) {
+        log.warn("Request service is unavailable. Fallback: returning false for userId: {}, eventId: {}", userId, eventId);
+        return false;
+    }
 }
 
 

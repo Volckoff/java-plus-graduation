@@ -4,10 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.model.UserAction;
-import ru.practicum.model.RecommendedEvent;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface UserActionRepository extends JpaRepository<UserAction, Long> {
 
@@ -15,10 +15,12 @@ public interface UserActionRepository extends JpaRepository<UserAction, Long> {
 
     List<UserAction> findAllByUserId(Long userId);
 
-    @Query("SELECT new ru.practicum.model.RecommendedEvent(ua.eventId, sum(ua.weight)) " +
-            "FROM UserAction ua WHERE ua.eventId in :ids GROUP BY ua.eventId")
-    List<RecommendedEvent> getSumWeightForEvents(@Param("ids") List<Long> ids);
+    @Query("SELECT DISTINCT ua.eventId FROM UserAction ua WHERE ua.userId = :userId ORDER BY ua.created DESC LIMIT :maxResult")
+    List<Long> findByUserIdOrderByCreatedDescLimitedTo(@Param("userId") Long userId, @Param("maxResult") int maxResult);
 
-    @Query("SELECT ua FROM UserAction ua WHERE ua.userId = :id ORDER BY ua.created DESC LIMIT :limit")
-    List<UserAction> findByUserIdOrderByCreatedDescLimitedTo(@Param("id") Long userId, @Param("limit") long limit);
+    List<UserAction> findAllByEventIdIn(Set<Long> eventIds);
+
+    @Query("SELECT DISTINCT ua.eventId FROM UserAction ua WHERE ua.userId = :userId AND ua.eventId IN :otherEventId")
+    List<Long> findEventIdsByUserIdAndEventIdIn(@Param("userId") long userId,
+                                                @Param("otherEventId") Set<Long> otherEventId);
 }

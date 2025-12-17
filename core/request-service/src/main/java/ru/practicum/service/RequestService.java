@@ -20,5 +20,7 @@ public interface RequestService {
                                                           EventRequestStatusUpdateRequestDto updateRequestDto);
 
     Long getConfirmedRequestsCount(Long eventId, ru.practicum.model.RequestStatus status);
+
+    Boolean hasConfirmedRequest(Long userId, Long eventId);
 }
 

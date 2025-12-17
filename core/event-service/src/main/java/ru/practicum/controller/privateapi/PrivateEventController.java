@@ -49,11 +49,4 @@ public class PrivateEventController {
                                @Valid @RequestBody UpdateEventUserRequestDto dto) {
         return eventService.updateUserEvent(userId, eventId, dto);
     }
-
-    @PostMapping("/{eventId}/like")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void likeEvent(@PathVariable Long userId,
-                          @PathVariable Long eventId) {
-        eventService.likeEvent(userId, eventId);
-    }
 }

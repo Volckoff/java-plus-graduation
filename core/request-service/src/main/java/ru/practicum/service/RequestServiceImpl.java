@@ -197,5 +197,13 @@ public class RequestServiceImpl implements RequestService {
         }
         return event;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Boolean hasConfirmedRequest(Long userId, Long eventId) {
+        return requestRepository.findByEventIdAndStatus(eventId, RequestStatus.CONFIRMED)
+                .stream()
+                .anyMatch(request -> request.getRequesterId().equals(userId));
+    }
 }
 

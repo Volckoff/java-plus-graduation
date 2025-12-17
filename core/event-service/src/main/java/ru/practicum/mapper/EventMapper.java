@@ -24,7 +24,7 @@ public interface EventMapper {
     @Mapping(target = "state", expression = "java(ru.practicum.model.EventState.PENDING)")
     @Mapping(target = "createdOn", expression = "java(mapNow())")
     @Mapping(target = "publishedOn", ignore = true)
-    @Mapping(target = "views", constant = "0L")
+    @Mapping(target = "rating", constant = "0.0")
     @Mapping(target = "category", source = "category")
     @Mapping(target = "initiatorId", source = "initiatorId")
     Event toEvent(NewEventDto newEventDto, Long initiatorId, Category category, Location location);
@@ -37,7 +37,7 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "initiatorId", ignore = true)
-    @Mapping(target = "views", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
     void patchFromUser(UpdateEventUserRequestDto src, @MappingTarget Event event);
 
@@ -49,7 +49,7 @@ public interface EventMapper {
     @Mapping(target = "publishedOn", ignore = true)
     @Mapping(target = "createdOn", ignore = true)
     @Mapping(target = "initiatorId", ignore = true)
-    @Mapping(target = "views", ignore = true)
+    @Mapping(target = "rating", ignore = true)
     @Mapping(target = "confirmedRequests", ignore = true)
     void patchFromAdmin(UpdateEventAdminRequestDto src, @MappingTarget Event event);
 

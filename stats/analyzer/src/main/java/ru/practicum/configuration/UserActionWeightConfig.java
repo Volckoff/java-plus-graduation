@@ -1,4 +1,4 @@
-package ru.practicum.kafka;
+package ru.practicum.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,15 +8,12 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Component
-@ConfigurationProperties("aggregator.user-action-weight")
+@ConfigurationProperties("analyzer.user-action-weight")
 public class UserActionWeightConfig {
-
-    private double view;
-    private double register;
-    private double like;
+    private double VIEW;
+    private double REGISTER;
+    private double LIKE;
 }
-
-
 
 
 

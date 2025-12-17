@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.AnalyzerClient;
 import ru.practicum.client.StatsClient;
 import ru.practicum.client.request.RequestClient;
 import ru.practicum.dto.compilation.CompilationDto;
@@ -23,6 +24,7 @@ import ru.practicum.repository.EventRepository;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationMapper compilationMapper;
     private final StatsClient statsClient;
     private final RequestClient requestClient;
+    private final AnalyzerClient analyzerClient;
 
     @Override
     @Transactional(readOnly = true)
@@ -56,6 +59,13 @@ public class CompilationServiceImpl implements CompilationService {
 
     private CompilationDto addConfirmedRequestsAndViews(CompilationDto compilationDto) {
         if (compilationDto.getEvents() != null && !compilationDto.getEvents().isEmpty()) {
+            List<Long> eventIds = compilationDto.getEvents().stream()
+                    .map(EventShortDto::getId)
+                    .collect(Collectors.toList());
+            
+            // Получаем рейтинги для всех событий
+            Map<Long, Double> ratingsMap = getEventRatings(eventIds);
+            
             for (EventShortDto eventDto : compilationDto.getEvents()) {
                 try {
                     Long confirmedRequests = requestClient.getConfirmedRequestsCount(eventDto.getId(),
@@ -66,9 +76,23 @@ public class CompilationServiceImpl implements CompilationService {
                             eventDto.getId(), e.getMessage());
                     eventDto.setConfirmedRequests(0L);
                 }
+                // Устанавливаем рейтинг
+                eventDto.setRating(ratingsMap.getOrDefault(eventDto.getId(), 0.0));
             }
         }
         return compilationDto;
+    }
+
+    private Map<Long, Double> getEventRatings(List<Long> eventIds) {
+        if (eventIds == null || eventIds.isEmpty()) {
+            return Map.of();
+        }
+        try {
+            return analyzerClient.getEventRatings(eventIds);
+        } catch (Exception e) {
+            log.warn("Не удалось получить рейтинги мероприятий: {}", e.getMessage());
+            return eventIds.stream().collect(Collectors.toMap(id -> id, id -> 0.0));
+        }
     }
 
     @Override

@@ -9,28 +9,29 @@ grpc:
       negotiationType: plaintext
 
 analyzer:
+  user-action-weight:
+    view: 0.4
+    register: 0.8
+    like: 1.0
   kafka:
-    config:
-      bootstrap-servers: "localhost:9092"
-
-      user-action-consumer:
-        group-id: "action-analyzer-group"
-        client-id: "action-consumer-1"
-        key-deserializer: "org.apache.kafka.common.serialization.LongDeserializer"
-        value-deserializer: "ru.practicum.avro.UserActionDeserializer"
-        attempt-timeout: 500
-        enable-auto-commit: "false"
-
-      event-similarity-consumer:
-        group-id: "similarity-analyzer-group"
-        client-id: "similarity-consumer-1"
-        key-deserializer: "org.apache.kafka.common.serialization.LongDeserializer"
-        value-deserializer: "ru.practicum.avro.EventSimilarityDeserializer"
-        attempt-timeout: 500
-        enable-auto-commit: "false"
-
-      user-action-topic: "stats.user-actions.v1"
-      events-similarity-topic: "stats.events-similarity.v1"
+    action-consumer-props:
+      bootstrap.servers: "localhost:9092"
+      group.id: "analyzer-group"
+      key.deserializer: "org.apache.kafka.common.serialization.LongDeserializer"
+      value.deserializer: "ru.practicum.avro.UserActionDeserializer"
+      enable.auto.commit: "false"
+      auto.offset.reset: "earliest"
+    similarity-consumer-props:
+      bootstrap.servers: "localhost:9092"
+      group.id: "analyzer-group"
+      key.deserializer: "org.apache.kafka.common.serialization.LongDeserializer"
+      value.deserializer: "ru.practicum.avro.EventSimilarityDeserializer"
+      enable.auto.commit: "false"
+      auto.offset.reset: "earliest"
+    topics:
+      USER_ACTIONS: "stats.user-actions.v1"
+      EVENTS_SIMILARITY: "stats.events-similarity.v1"
+    attempt-timeout: 500
 
 spring:
   jpa:

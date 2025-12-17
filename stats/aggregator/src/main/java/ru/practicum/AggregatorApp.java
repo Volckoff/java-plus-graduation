@@ -7,7 +7,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @EnableDiscoveryClient
-@ConfigurationPropertiesScan
+@ConfigurationPropertiesScan(basePackages = "ru.practicum")
 @SpringBootApplication
 public class AggregatorApp {
     public static void main(String[] args) {

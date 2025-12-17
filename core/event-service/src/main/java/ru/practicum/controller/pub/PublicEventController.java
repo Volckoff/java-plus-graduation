@@ -39,7 +39,23 @@ public class PublicEventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getById(@PathVariable Long eventId, HttpServletRequest request) {
-        return eventService.getPublicEvent(eventId, request);
+    public EventFullDto getById(@PathVariable Long eventId,
+                                 @RequestHeader(value = "X-EWM-USER-ID", required = false) Long userId,
+                                 HttpServletRequest request) {
+        return eventService.getPublicEvent(eventId, userId, request);
+    }
+
+    @GetMapping("/recommendations")
+    public List<EventShortDto> getRecommendations(
+            @RequestHeader(value = "X-EWM-USER-ID", required = true) Long userId,
+            @RequestParam(defaultValue = "10") @Positive int size) {
+        return eventService.getRecommendations(userId, size);
+    }
+
+    @PutMapping("/{eventId}/like")
+    @ResponseStatus(org.springframework.http.HttpStatus.NO_CONTENT)
+    public void likeEvent(@PathVariable Long eventId,
+                          @RequestHeader(value = "X-EWM-USER-ID", required = true) Long userId) {
+        eventService.likeEvent(userId, eventId);
     }
 }

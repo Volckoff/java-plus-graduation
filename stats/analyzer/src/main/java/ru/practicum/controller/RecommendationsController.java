@@ -1,54 +1,65 @@
 package ru.practicum.controller;
 
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import ru.practicum.grpc.stat.analyzer.RecommendationsControllerGrpc;
-import ru.practicum.grpc.stat.request.InteractionsCountRequestProto;
-import ru.practicum.grpc.stat.request.RecommendedEventProto;
-import ru.practicum.grpc.stat.request.SimilarEventsRequestProto;
-import ru.practicum.grpc.stat.request.UserPredictionsRequestProto;
-import ru.practicum.service.RecommendationService;
-
-import java.util.List;
+import ru.practicum.grpc.stats.analyzer.RecommendationsControllerGrpc;
+import ru.practicum.grpc.stats.recommendation.InteractionsCountRequestProto;
+import ru.practicum.grpc.stats.recommendation.RecommendedEventProto;
+import ru.practicum.grpc.stats.recommendation.SimilarEventsRequestProto;
+import ru.practicum.grpc.stats.recommendation.UserPredictionsRequestProto;
+import ru.practicum.service.AnalyzerService;
 
 @GrpcService
 @Slf4j
 @RequiredArgsConstructor
 public class RecommendationsController extends RecommendationsControllerGrpc.RecommendationsControllerImplBase {
-    private final RecommendationService recommendationService;
+    private final AnalyzerService analyzerService;
 
     @Override
     public void getRecommendationsForUser(UserPredictionsRequestProto request,
                                           StreamObserver<RecommendedEventProto> responseObserver) {
-        log.info("Вызов getRecommendationsForUser для request = {}", request);
-        List<RecommendedEventProto> recommendedEvents = recommendationService.generateRecommendationsForUser(request);
-        for (RecommendedEventProto event : recommendedEvents) {
-            responseObserver.onNext(event);
+        try {
+            log.info("Запрос на реккомендацию для юзера с ID = {}", request.getUserId());
+            analyzerService.getRecommendationsForUser(request).forEach(responseObserver::onNext);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Ошибка getRecommendationsForUser", e);
+            responseObserver.onError(
+                    new StatusRuntimeException(Status.INTERNAL.withDescription(e.getLocalizedMessage()).withCause(e)));
         }
-        responseObserver.onCompleted();
     }
 
     @Override
     public void getSimilarEvents(SimilarEventsRequestProto request,
                                  StreamObserver<RecommendedEventProto> responseObserver) {
-        log.info("Вызов getSimilarEvents для request = {}", request);
-        List<RecommendedEventProto> recommendedEvents = recommendationService.getSimilarEvents(request);
-        for (RecommendedEventProto event : recommendedEvents) {
-            responseObserver.onNext(event);
+        try {
+            log.info("Запрос на аналогичное событие с ID = {} от юзера с ID = {}", request.getEventId(),
+                    request.getUserId());
+            analyzerService.getSimilarEvents(request).forEach(responseObserver::onNext);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Ошибка getSimilarEvents", e);
+            responseObserver.onError(
+                    new StatusRuntimeException(Status.INTERNAL.withDescription(e.getLocalizedMessage()).withCause(e)));
         }
-        responseObserver.onCompleted();
     }
 
     @Override
     public void getInteractionsCount(InteractionsCountRequestProto request,
                                      StreamObserver<RecommendedEventProto> responseObserver) {
-        log.info("Вызов getInteractionsCount для request = {}", request);
-        List<RecommendedEventProto> recommendedEvents = recommendationService.getInteractionsCount(request);
-        for (RecommendedEventProto event : recommendedEvents) {
-            responseObserver.onNext(event);
+        try {
+            log.info("Запрос на подсчет количества взаимодействий для оценки событий с идентификаторами = {}",
+                    request.getEventIdList());
+            analyzerService.getInteractionsCount(request).forEach(responseObserver::onNext);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            log.error("Ошибка getInteractionsCount", e);
+            responseObserver.onError(
+                    new StatusRuntimeException(Status.INTERNAL.withDescription(e.getLocalizedMessage()).withCause(e)));
         }
-        responseObserver.onCompleted();
     }
 }
