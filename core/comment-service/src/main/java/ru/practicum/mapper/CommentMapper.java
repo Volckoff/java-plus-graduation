@@ -1,45 +1,60 @@
 package ru.practicum.mapper;
 
-import org.mapstruct.*;
+import org.springframework.stereotype.Component;
 import ru.practicum.dto.comment.CommentAdminDto;
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.comment.NewCommentDto;
 import ru.practicum.dto.comment.UpdateCommentDto;
 import ru.practicum.model.Comment;
+import ru.practicum.model.CommentStatus;
 
-@Mapper(componentModel = "spring")
-public interface CommentMapper {
+@Component
+public class CommentMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdOn", ignore = true)
-    @Mapping(target = "updatedOn", ignore = true)
-    @Mapping(target = "authorId", source = "authorId")
-    @Mapping(target = "eventId", source = "eventId")
-    @Mapping(target = "status", expression = "java(ru.practicum.model.CommentStatus.PENDING)")
-    Comment toComment(NewCommentDto newCommentDto, Long authorId, Long eventId);
+    public Comment toComment(NewCommentDto newCommentDto, Long authorId, Long eventId) {
+        if (newCommentDto == null && authorId == null && eventId == null) {
+            return null;
+        }
+        return Comment.builder()
+                .text(newCommentDto != null ? newCommentDto.getText() : null)
+                .authorId(authorId)
+                .eventId(eventId)
+                .status(CommentStatus.PENDING)
+                .build();
+    }
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdOn", ignore = true)
-    @Mapping(target = "updatedOn", ignore = true)
-    @Mapping(target = "authorId", ignore = true)
-    @Mapping(target = "eventId", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    void patchFromDto(UpdateCommentDto updateCommentDto, @MappingTarget Comment comment);
+    public void patchFromDto(UpdateCommentDto updateCommentDto, Comment comment) {
+        if (updateCommentDto == null || comment == null) {
+            return;
+        }
+        if (updateCommentDto.getText() != null) {
+            comment.setText(updateCommentDto.getText());
+        }
+    }
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdOn", ignore = true)
-    @Mapping(target = "updatedOn", ignore = true)
-    @Mapping(target = "authorId", ignore = true)
-    @Mapping(target = "eventId", ignore = true)
-    @Mapping(target = "text", source = "text")
-    @Mapping(target = "status", source = "status")
-    void patchFromAdminDto(CommentAdminDto commentAdminDto, @MappingTarget Comment comment);
+    public void patchFromAdminDto(CommentAdminDto commentAdminDto, Comment comment) {
+        if (commentAdminDto == null || comment == null) {
+            return;
+        }
+        if (commentAdminDto.getText() != null) {
+            comment.setText(commentAdminDto.getText());
+        }
+        if (commentAdminDto.getStatus() != null) {
+            comment.setStatus(commentAdminDto.getStatus());
+        }
+    }
 
-    @Mapping(target = "author", ignore = true)
-    @Mapping(target = "eventId", source = "eventId")
-    CommentDto toDto(Comment comment);
-
+    public CommentDto toDto(Comment comment) {
+        if (comment == null) {
+            return null;
+        }
+        return CommentDto.builder()
+                .id(comment.getId())
+                .eventId(comment.getEventId())
+                .text(comment.getText())
+                .createdOn(comment.getCreatedOn())
+                .updatedOn(comment.getUpdatedOn())
+                .status(comment.getStatus())
+                .build();
+    }
 }
-

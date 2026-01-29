@@ -11,5 +11,9 @@ public interface RequestOperation {
     @GetMapping("/admin/requests/count/{eventId}")
     Long getConfirmedRequestsCount(@PathVariable @NotNull Long eventId, 
                                    @RequestParam(name = "status") RequestStatus status);
+
+    @GetMapping("/users/{userId}/requests/event/{eventId}/confirmed")
+    Boolean hasConfirmedRequest(@PathVariable @NotNull Long userId, 
+                                @PathVariable @NotNull Long eventId);
 }
 

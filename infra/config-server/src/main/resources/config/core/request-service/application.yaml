@@ -42,3 +42,11 @@ logging:
     "org.springframework.transaction": INFO
     "org.hibernate.SQL": DEBUG
 
+grpc:
+  client:
+    collector:
+      address: 'discovery:///collector'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+

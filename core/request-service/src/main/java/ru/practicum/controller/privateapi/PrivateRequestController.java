@@ -39,5 +39,12 @@ public class PrivateRequestController {
                                                  @PathVariable @Positive Long requestId) {
         return requestService.cancelRequest(userId, requestId);
     }
+
+    @GetMapping("/event/{eventId}/confirmed")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean hasConfirmedRequest(@PathVariable @Positive Long userId,
+                                       @PathVariable @Positive Long eventId) {
+        return requestService.hasConfirmedRequest(userId, eventId);
+    }
 }
 

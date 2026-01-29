@@ -1,13 +1,10 @@
 package ru.practicum.client;
 
-import ru.practicum.EndpointHitDto;
-import ru.practicum.ViewStatsDto;
-
-import java.util.List;
-
 public interface StatsClient {
 
-    void saveHit(EndpointHitDto endpointHitDto);
+    void recordView(Long userId, Long eventId);
 
-    List<ViewStatsDto> getStats(String start, String end, List<String> uris, Boolean unique);
+    void recordRegister(Long userId, Long eventId);
+
+    void recordLike(Long userId, Long eventId);
 }

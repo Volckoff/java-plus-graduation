@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS events (
     participant_limit INT NOT NULL,
     request_moderation BOOLEAN NOT NULL,
     confirmed_requests INT NOT NULL,
-    views BIGINT NOT NULL
+    rating DOUBLE PRECISION NOT NULL DEFAULT 0.0
 );
 
 CREATE TABLE IF NOT EXISTS compilation (

@@ -6,8 +6,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ViewStatsDto;
+import ru.practicum.client.AnalyzerClient;
 import ru.practicum.client.StatsClient;
+import ru.practicum.client.request.RequestClient;
 import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.dto.compilation.NewCompilationDto;
 import ru.practicum.dto.compilation.UpdateCompilationRequestDto;
@@ -20,11 +21,7 @@ import ru.practicum.model.Event;
 import ru.practicum.model.RequestStatus;
 import ru.practicum.repository.CompilationRepository;
 import ru.practicum.repository.EventRepository;
-import ru.practicum.client.request.RequestClient;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +39,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationMapper compilationMapper;
     private final StatsClient statsClient;
     private final RequestClient requestClient;
+    private final AnalyzerClient analyzerClient;
 
     @Override
     @Transactional(readOnly = true)
@@ -61,13 +59,14 @@ public class CompilationServiceImpl implements CompilationService {
 
     private CompilationDto addConfirmedRequestsAndViews(CompilationDto compilationDto) {
         if (compilationDto.getEvents() != null && !compilationDto.getEvents().isEmpty()) {
-            List<String> uris = compilationDto.getEvents().stream()
-                    .map(event -> "/events/" + event.getId())
+            List<Long> eventIds = compilationDto.getEvents().stream()
+                    .map(EventShortDto::getId)
                     .collect(Collectors.toList());
-            Map<String, Long> viewsMap = getViewsFromStats(uris);
+            
+            // Получаем рейтинги для всех событий
+            Map<Long, Double> ratingsMap = getEventRatings(eventIds);
+            
             for (EventShortDto eventDto : compilationDto.getEvents()) {
-                String eventUri = "/events/" + eventDto.getId();
-                eventDto.setViews(viewsMap.getOrDefault(eventUri, 0L));
                 try {
                     Long confirmedRequests = requestClient.getConfirmedRequestsCount(eventDto.getId(),
                             RequestStatus.CONFIRMED);
@@ -77,30 +76,22 @@ public class CompilationServiceImpl implements CompilationService {
                             eventDto.getId(), e.getMessage());
                     eventDto.setConfirmedRequests(0L);
                 }
+                // Устанавливаем рейтинг
+                eventDto.setRating(ratingsMap.getOrDefault(eventDto.getId(), 0.0));
             }
         }
         return compilationDto;
     }
 
-    private Map<String, Long> getViewsFromStats(List<String> uris) {
+    private Map<Long, Double> getEventRatings(List<Long> eventIds) {
+        if (eventIds == null || eventIds.isEmpty()) {
+            return Map.of();
+        }
         try {
-            LocalDateTime end = LocalDateTime.now();
-            LocalDateTime start = end.minusYears(1);
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            List<ViewStatsDto> stats = statsClient.getStats(
-                    start.format(formatter),
-                    end.format(formatter),
-                    uris,
-                    false
-            );
-            Map<String, Long> viewsMap = new HashMap<>();
-            for (ViewStatsDto stat : stats) {
-                viewsMap.put(stat.getUri(), stat.getHits());
-            }
-            return viewsMap;
+            return analyzerClient.getEventRatings(eventIds);
         } catch (Exception e) {
-            log.warn("Ошибка при получении данных из сервиса статистики: {}", e.getMessage());
-            return new HashMap<>();
+            log.warn("Не удалось получить рейтинги мероприятий: {}", e.getMessage());
+            return eventIds.stream().collect(Collectors.toMap(id -> id, id -> 0.0));
         }
     }
 

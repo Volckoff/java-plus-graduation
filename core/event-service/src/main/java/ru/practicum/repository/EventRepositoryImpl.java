@@ -74,7 +74,7 @@ public class EventRepositoryImpl implements EventRepositoryCustom {
         if (Boolean.TRUE.equals(onlyAvailable)) {
             available = e.participantLimit.eq(0).or(e.confirmedRequests.lt(e.participantLimit));
         }
-        OrderSpecifier<?> order = "VIEWS".equals(sort) ? e.views.desc() : e.eventDate.asc();
+        OrderSpecifier<?> order = "RATING".equals(sort) ? e.rating.desc() : e.eventDate.asc();
 
         return queryFactory.selectFrom(e)
                 .leftJoin(e.category, c).fetchJoin()

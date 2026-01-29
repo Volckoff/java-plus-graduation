@@ -6,6 +6,7 @@ import feign.FeignException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -84,6 +85,19 @@ public class GlobalExceptionHandler {
         String message = String.format("Отсутствует обязательный параметр: '%s' типа '%s'", 
                 e.getParameterName(), e.getParameterType());
         log.warn("Отсутствует параметр запроса: {}", message);
+        return new ApiError(
+                "BAD_REQUEST",
+                "Переданы некорректные данные.",
+                message,
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiError handleMissingRequestHeaderException(MissingRequestHeaderException e) {
+        String message = String.format("Отсутствует обязательный заголовок: '%s'", e.getHeaderName());
+        log.warn("Отсутствует заголовок запроса: {}", message);
         return new ApiError(
                 "BAD_REQUEST",
                 "Переданы некорректные данные.",
